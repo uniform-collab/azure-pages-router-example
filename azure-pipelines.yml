@@ -2,9 +2,16 @@
 # Build a general Node.js project with npm.
 # Add steps that analyze code, save build artifacts, deploy, and more:
 # https://docs.microsoft.com/azure/devops/pipelines/languages/javascript
-
+                
 trigger:
 - main
+
+variables:
+  RESOURCE_GROUP: 'dev-nikitam-eastus-rg'
+  PROFILE_NAME: 'nikitam-fd'
+  ENDPOINT_DOMAIN: 'pfg-uniform-g8bxgge7aqhwb2by.z01.azurefd.net'
+  STORAGE_ACCOUNT_NAME: 'pfgpoc'
+  CONTENT_PATHS: '["/*"]'  
 
 pool:
   vmImage: ubuntu-latest
@@ -26,14 +33,29 @@ steps:
 - task: AzureCLI@2
   displayName: 'Upload site to $web'
   inputs:
-    azureSubscription: 'dev-nikitam-eastus-rg'     # same ARM service connection
+    azureSubscription: $(RESOURCE_GROUP)   
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
       az storage blob upload-batch \
-        --account-name pfgpoc \
+        --account-name $(STORAGE_ACCOUNT_NAME) \
         --account-key "$STORAGE_KEY" \
         -s ./out \
         -d '$web' \
         --overwrite \
         --auth-mode key
+
+
+- task: AzureCLI@2
+  displayName: 'Purge Front Door CDN cache'
+  inputs:
+    azureSubscription: 'dev-nikitam-eastus-rg'     
+    scriptType: bash
+    scriptLocation: inlineScript
+    inlineScript: |
+      az login --identity
+      az afd endpoint purge \
+        --resource-group $RESOURCE_GROUP \
+        --profile-name $PROFILE_NAME \
+        --domains $ENDPOINT_NAME \
+        --content-paths $CONTENT_PATHS
