@@ -56,5 +56,5 @@ steps:
       az afd endpoint purge \
         --resource-group $RESOURCE_GROUP \
         --profile-name $PROFILE_NAME \
-        --domains $ENDPOINT_NAME \
+        --domains $ENDPOINT_DOMAIN \
         --content-paths $CONTENT_PATHS
