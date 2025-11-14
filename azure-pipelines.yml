@@ -54,9 +54,15 @@ steps:
     scriptType: bash
     scriptLocation: inlineScript
     inlineScript: |
+      set -euo pipefail
+      echo "Running purge..."
+      echo "RG=$RESOURCE_GROUP | PROFILE=$PROFILE_NAME | ENDPOINT=$ENDPOINT_NAME | DOMAINS=$ENDPOINT_DOMAIN | PATHS=$CONTENT_PATHS"
       az afd endpoint purge \
         --resource-group $RESOURCE_GROUP \
         --profile-name $PROFILE_NAME \
         --domains $ENDPOINT_DOMAIN \
         --content-paths $CONTENT_PATHS \
-        --endpoint-name $ENDPOINT_NAME
+        --endpoint-name $ENDPOINT_NAME \
+        --no-wait \
+        --only-show-errors
+      echo "Purge request submitted."
