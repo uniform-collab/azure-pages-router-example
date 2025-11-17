@@ -19,6 +19,11 @@ export const getStaticProps = withUniformGetStaticProps({
         : CANVAS_PUBLISHED_STATE,
   },
   param: "slug",
+  client: new RouteClient({
+    apiKey: process.env.UNIFORM_API_KEY,
+    projectId: process.env.UNIFORM_PROJECT_ID,
+    disableSWR: true,
+  }),
   handleComposition: async (
     { compositionApiResponse },
     { preview },
